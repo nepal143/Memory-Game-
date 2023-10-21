@@ -1,0 +1,87 @@
+body {
+    background-color: black;
+    text-align: center;
+    color: white;
+    font-family: monospace;
+    font-size: 2em;
+}
+
+#game-board {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 10px;
+    width: 700px;
+    margin: 0 auto;
+}
+
+.card-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card img {
+    display: none;
+    width: 100px;
+    height: 100px;
+}
+
+.card {
+    width: 100px;
+    height: 100px;
+    background-color: #00fbea;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    perspective: 1000px;
+    transition: transform 0.5s;
+}
+
+.card.face-down {
+    transform: rotateY(180deg);
+    background: #00fbea;
+}
+
+.card.face-up {
+    transform: rotateY(0deg);
+    background: #00fbea;
+}
+
+.disabled {
+    pointer-events: none;
+}
+
+.you-win {
+    top: 0;
+    left: 0;
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    text-justify: center;
+    text-align: center;
+    display: none;
+    font-size: 36px;
+    color: green;
+}
+
+.you-lose {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    text-justify: center;
+    text-align: center;
+    display: none;
+    font-size: 36px;
+    color: red;
+}
+
+@media screen and (max-width:700px) {
+
+    h1,
+    p {
+        font-size: 2em;
+    }
+}
