@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Memory Game</title>
+    <style>
+        body {
+            background-color: black;
+            text-align: center;
+            color: white;
+            font-family: monospace;
+            font-size: 2em;
+        }
+
+        #game-board {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+            width: 700px;
+            margin: 0 auto;
+        }
+
+        .card-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card img {
+            display: none;
+            width: 100px;
+            height: 100px;
+        }
+
+        .card {
+            width: 100px;
+            height: 100px;
+            background-color: #00fbea;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            perspective: 1000px;
+            transition: transform 0.5s;
+        }
+
+        .card.face-down {
+            transform: rotateY(180deg);
+            background: #00fbea;
+        }
+
+        .card.face-up {
+            transform: rotateY(0deg);
+            background: #00fbea;
+        }
+
+        .disabled {
+            pointer-events: none;
+        }
+
+        .you-win {
+            top: 0;
+            left: 0;
+            position: absolute;
+            width: 100vw;
+            height: 100vh;
+            text-justify: center;
+            text-align: center;
+            display: none;
+            font-size: 36px;
+            color: green;
+        }
+
+        .you-lose {
+            position: absolute;
+            width: 100vw;
+            height: 100vh;
+            text-justify: center;
+            text-align: center;
+            display: none;
+            font-size: 36px;
+            color: red;
+        }
+
+        @media screen and (max-width:700px) {
+
+            h1,
+            p {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Memory Game</h1>
+    <p>Score: <span id="score">0</span></p>
+    <p>Time: <span id="timer">90</span> seconds</p>
+    <div id="game-board">
+
+    </div>
+    <div class="you-win" id="you-win">You Win!</div>
+    <div class="you-lose" id="you-lose">You Lose!</div>
+    <script>
+
+
+
+        const images = [...Array(15).keys()].map(i => `assets/${i + 1}.png`);
+
+        const imagePairs = [...images, ...images];
+
+
+        shuffle(imagePairs);
+
+        let score = 0;
+        let firstCard = null;
+        let timer = 100;
+        let isComparing = false;
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+
+        function startGame() {
+            const gameBoard = document.getElementById("game-board");
+
+            for (let i = 0; i < imagePairs.length; i++) {
+                const cardContainer = document.createElement("div");
+                cardContainer.classList.add("card-container");
+                const card = document.createElement("div");
+                card.classList.add("card", "face-down");
+                card.dataset.index = i;
+                const image = document.createElement("img");
+                image.src = imagePairs[i];
+                card.appendChild(image);
+                cardContainer.appendChild(card);
+                cardContainer.addEventListener("click", handleCardClick);
+                gameBoard.appendChild(cardContainer);
+            }
+
+            const timerInterval = setInterval(() => {
+                timer--;
+                document.getElementById("timer").textContent = timer + " seconds";
+
+                if (timer <= 0) {
+                    clearInterval(timerInterval);
+                    document.getElementById("you-lose").style.display = "block";
+                } else if (score === imagePairs.length) {
+                    clearInterval(timerInterval);
+                    document.getElementById("you-win").style.display = "block";
+                }
+            }, 1000);
+        }
+
+        function handleCardClick(event) {
+            if (timer > 0) {
+
+                const cardContainer = event.currentTarget;
+                const card = cardContainer.querySelector(".card");
+                const index = card.dataset.index;
+
+                if (isComparing || card.classList.contains('disabled') || card.classList.contains('face-up')) {
+                    return;
+                }
+
+                card.classList.add('face-up');
+                card.firstElementChild.style.display = "block";
+
+                if (firstCard === null) {
+                    firstCard = card;
+                } else {
+                    isComparing = true;
+                    if (firstCard.firstElementChild.src === card.firstElementChild.src) {
+
+                        score += 2;
+                        document.getElementById("score").textContent = score;
+                        firstCard.classList.add('disabled');
+                        card.classList.add('disabled');
+                        firstCard = null;
+                        isComparing = false;
+                    } else {
+
+                        setTimeout(() => {
+                            firstCard.classList.remove('face-up');
+                            firstCard.firstElementChild.style.display = "none";
+                            card.classList.remove('face-up');
+                            card.firstElementChild.style.display = "none";
+                            firstCard = null;
+                            isComparing = false;
+                        }, 1000);
+                    }
+                }
+            }
+        }
+
+        startGame();
+    </script>
+</body>
+
+</html>
